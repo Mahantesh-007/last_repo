@@ -1,83 +1,75 @@
-import { Writable } from 'stream';
-import FormData from 'form-data';
-import formidable from 'formidable';
+const path = require("path");
+import FileUpload from "@/models/File";
+const multer = require("multer");
+import connectDB from "@/middleware/db";
+
+const upload = multer({
+  dest: "public/uploads/",
+  storage: multer.diskStorage({
+    destination(req, file, cb) {
+      cb(null, "./public/uploads");
+    },
+    filename(req, file, cb) {
+      cb(null, `${new Date().getTime()}_${file.originalname}`);
+    },
+  }),
+  limits: {
+    fileSize: 1000000000, // max file size 1MB = 1000000 bytes
+  },
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(jpeg|jpg|png|pdf|doc|docx|xlsx|xls)$/)) {
+      return cb(
+        new Error(
+          "only upload files with jpg, jpeg, png, pdf, doc, docx, xslx, xls format."
+        )
+      );
+    }
+    cb(undefined, true); // continue with upload
+  },
+});
 
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: false, // Disable automatic body parsing
   },
 };
 
-const formidableConfig = {
-  keepExtensions: true,
-  maxFileSize: 10000000,
-  maxFieldsSize: 10000000,
-  maxFields: 7,
-  allowEmptyFiles: false,
-  multiples: false,
-};
-
-function formidablePromise(req, opts) {
-  return new Promise((resolve, reject) => {
-    const form = formidable(opts);
-
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        return reject(err);
-      }
-
-      return resolve({ fields, files });
-    });
-  });
-}
-
-const fileConsumer = (acc) => {
-  const writable = new Writable({
-    write: (chunk, _enc, next) => {
-      acc.push(chunk);
-      next();
-    },
-  });
-
-  return writable;
-};
-
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(404).end();
-  }
-
-  try {
-    const chunks = [];
-    const { fields, files } = await formidablePromise(req, {
-      ...formidableConfig,
-      fileWriteStreamHandler: () => fileConsumer(chunks),
-    });
-
-    console.log(fields);
-    console.log(files);
-    const { file } = files;
-    const fileData = Buffer.concat(chunks);
-
-    const form = new FormData();
-    form.append('my_field', 'my value');
-    form.append('my_file', fileData);
-
-    const apiRes = await fetch(
-      `${API_URL}/playlist_api/playlists/${playlistid}/`,
-      {
-        method: 'PATCH',
-        headers: {
-          Accept: 'application/json',
-          Authorization: `Bearer ${access}`,
-        },
-        body: form,
-      }
-    );
-
-    return res.status(204).end();
-  } catch (err) {
-    return res.status(500).json({ error: 'Internal Server Error' });
+  if (req.method === "POST") {
+    try {
+      console.log("debug1");
+      connectDB();
+      console.log("debug2");
+      await new Promise((resolve, reject) => {
+        upload.single("file")(req, res, (error) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve();
+          }
+        });
+      });
+      const { title, description, subject, code, department, author } =
+        req.body;
+      const { path, mimetype } = req.file;
+      const file = new FileUpload({
+        title,
+        description,
+        file_path: path,
+        file_mimetype: mimetype,
+        subject,
+        code,
+        department,
+        author,
+      });
+      console.log(file);
+      await file.save();
+      res.send("file uploaded successfully.");
+    } catch (error) {
+      res.status(400).send("Error while uploading file. Try again later.");
+      console.log(error);
+    }
+  } else {
+    res.status(405).send("Method not allowed.");
   }
 }
-

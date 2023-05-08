@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import Register from "@/models/adminSignUp";
 import connectDB from "@/middleware/db";
 import { useRouter } from "next/router";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function displayStudent({ studentMembers }) {
   const router = useRouter();
@@ -24,6 +26,22 @@ function displayStudent({ studentMembers }) {
         body: JSON.stringify({}),
       });
       const data = await response.json();
+      
+      if (response.ok) {
+        toast.success("Success", {
+          position: "top-center",
+          autoClose: 500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        })};
+        setTimeout(()=>(
+          router.push("/admin/displayStudents")
+        ),2000);
+     
       console.log(data);
     } catch (error) {
       console.error(error);
@@ -49,7 +67,21 @@ function displayStudent({ studentMembers }) {
   };
 
   return (
+    
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+       <ToastContainer
+        position="top-center"
+        autoClose={500}
+        limit={1}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
@@ -81,7 +113,8 @@ function displayStudent({ studentMembers }) {
         </thead>
         <tbody>
           {studentMembers &&
-            Object.keys(studentMembers).map((item) => {
+            Object.keys(studentMembers).filter(students =>!studentMembers[students].isStudent)
+            .map((item) => {
               const student = studentMembers[item];
               return student.usn !== null ? (
                 <tr key={student._id}>
@@ -134,6 +167,7 @@ export async function getServerSideProps(context) {
       username: member.username,
       email: member.email,
       usn: member.usn ? member.usn : null,
+      isStudent : member.isStudent
     }));
 
     return {

@@ -19,6 +19,15 @@ const uploadedNotes = () => {
       >
         Upload 
       </Link>
+      <Link
+        href={{
+          pathname: "/Faculty/fileUpload",
+          query: { id: subjectid },
+        }}
+        class="text-indigo-500 inline-flex items-center"
+      >
+        Upload 
+      </Link>
     </div>
   );
 };

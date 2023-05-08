@@ -6,20 +6,31 @@ import Link from "next/link";
 
 const displaySubject = ({ subjectFind }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const uniqueSubjects = Object.values(
+    subjectFind.reduce((acc, obj) => {
+      if (!acc[obj.code]) {
+        acc[obj.code] = obj;
+      }
+      return acc;
+    }, {})
+  );
 
   const router = useRouter();
   const { id } = router.query;
   const departmentid = id;
-  let subjectsInDepartment = [];
 
-  if (Array.isArray(subjectFind)) {
-    subjectsInDepartment = subjectFind.filter(
-      (subject) => subject.department === departmentid
-    );
-  }
-  const filteredData = subjectsInDepartment.filter((item) =>
-    item.subjectname.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredData = uniqueSubjects.filter(
+    (subject) => subject.department === departmentid
   );
+
+  // If search query is present, filter the data by subject name
+  const subjectDisplayed = searchQuery
+    ? filteredData.filter((subject) =>
+        subject.subjectname.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : filteredData;
+  
+ 
   return (
     <section class="text-gray-600 body-font">
       <div>
@@ -31,9 +42,9 @@ const displaySubject = ({ subjectFind }) => {
         />
       </div>
       <div class="container px-5 py-24 mx-auto">
-        {filteredData.map((item) => (
-          <div key={item.id} class="flex flex-wrap -m-4">
-            {subjectsInDepartment.map((subject) => (
+        <div class="flex flex-wrap -m-4">
+          {
+            subjectDisplayed.map((subject) => (
               <div key={subject.id} class="xl:w-1/3 md:w-1/2 p-4">
                 <div class="border border-gray-200 p-6 rounded-lg">
                   <h2 class="text-lg text-gray-900 font-medium title-font mb-2">
@@ -43,7 +54,7 @@ const displaySubject = ({ subjectFind }) => {
                   <Link
                     href={{
                       pathname: "/Students/displayNotes",
-                      query: { id: subject._id },
+                      query: { id: subject.code },
                     }}
                     class="text-indigo-500 inline-flex items-center"
                   >
@@ -64,8 +75,7 @@ const displaySubject = ({ subjectFind }) => {
                 </div>
               </div>
             ))}
-          </div>
-        ))}
+        </div>
       </div>
     </section>
   );

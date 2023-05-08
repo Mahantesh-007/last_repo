@@ -41,7 +41,7 @@ export default async function handler(req, res) {
 
         user.isStudent = true;
         await user.save();
-        res.status(200).json({ success: true, data: user });
+        res.status(200).json({ success: true, data: user, message:"Student Approved" });
       } catch (error) {
         res.status(400).json({ success: false, error: error.message });
       }
