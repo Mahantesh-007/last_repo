@@ -13,7 +13,7 @@ const Login = () => {
     if (token) {
       const decodedToken = jwt_decode(token);
       if (decodedToken.isAdmin === true) {
-        router.push("/admin/adminPanel");
+        router.push("/admin/addBranch");
       }
     }
   }, []);
@@ -27,7 +27,7 @@ const Login = () => {
       localStorage.setItem("token", res.data.token);
       setEmail("");
       setPassword("");
-      router.push("/admin/adminPanel");
+      router.push("/admin/addBranch");
       
     }
   };

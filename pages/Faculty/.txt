@@ -1,0 +1,71 @@
+      <div class="container px-5 py-24 mx-auto">
+        <div class="flex flex-wrap -m-4">
+          {filteredData.length > 0 &&
+            notesInSubject
+              .filter((item) => item.code === subjectid)
+              .map((notes) => (
+                <div key={notes._id} class="xl:w-1/3 md:w-1/2 p-4">
+                  <div class="border border-gray-200 p-6 rounded-lg">
+                    <Link
+                      href={{
+                        pathname: "/Students/viewNotes",
+                        query: { path: `${notes.filename}`, file: notes._id },
+                      }}
+                      class="text-indigo-500 inline-flex items-center"
+                    >
+                      Preview
+                    </Link>
+                    <Link
+                      href={notes.filename}
+                      class="text-lg text-gray-900 font-medium title-font mb-2"
+                    >
+                      {notes.description}
+                    </Link>
+                    <p class="leading-relaxed text-base">{notes.description}</p>
+                  </div>
+                </div>
+              ))}
+          {filesInSubject.map((items) => (
+            <div key={items._id} class="xl:w-1/3 md:w-1/2 p-4">
+              <div class="border border-gray-200 p-6 rounded-lg">
+                <Link
+                  href={{
+                    pathname: "/Students/viewNotes",
+                    query: { path: `${items.file_path}`, file: items._id },
+                  }}
+                  class="text-indigo-500 inline-flex items-center"
+                >
+                  Preview
+                </Link>
+                <Link
+                  href={items.file_path}
+                  class="text-lg text-gray-900 font-medium title-font mb-2"
+                >
+                  {items.title}
+                </Link>
+                <p class="leading-relaxed text-base">{items.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <h1>subject id : {subjectid}</h1>
+      <Link
+        href={{
+          pathname: "/Faculty/facultyUpload",
+          query: { id: subjectid },
+        }}
+        class="text-indigo-500 inline-flex items-center"
+      >
+        Upload
+      </Link>
+      <Link
+        href={{
+          pathname: "/Faculty/fileUpload",
+          query: { id: subjectid },
+        }}
+        class="text-indigo-500 inline-flex items-center"
+      >
+        Upload
+      </Link>

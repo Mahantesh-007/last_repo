@@ -7,7 +7,6 @@ const AdminHead = () => {
     router.push(event.target.value);
   }
 
-  
   const logoutMain = (e) => {
     localStorage.removeItem("token");
     router.push("/admin/Login");
@@ -15,49 +14,74 @@ const AdminHead = () => {
   };
 
   return (
-    <header className="text-gray-400 bg-gray-900 body-font">
-      <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-        <a className="flex title-font font-medium items-center text-white mb-4 md:mb-0">
+    <header className="bg-gray-900">
+      <div className="container mx-auto flex flex-wrap items-center justify-between py-6 px-4 md:px-6">
+        <a className="flex items-center text-white mr-6">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            className="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            className="w-10 h-10 text-red-500 p-2 rounded-full"
             viewBox="0 0 24 24"
           >
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
           </svg>
-          <span className="ml-3 text-xl">Pentagon</span>
+          <span className="ml-3 text-xl font-bold">Notes Repository</span>
         </a>
-        <nav className="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-700	flex flex-wrap items-center text-base justify-center"></nav>
-        <select onChange={navigateToPage}>
-          <option value="">Approval</option>
-          <option value="/admin/displayFaculty">Faculty Approval</option>
-          <option value="/admin/displayStudents">Student Approval</option>
-        </select>
-
-        <Link href="/admin/Login">
+        <nav className="md:flex md:items-center md:justify-center">
+          <div className="relative mt-4 md:mt-0">
+            <select
+              className="bg-gray-800 text-white border-0 py-2 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              onChange={navigateToPage}
+            >
+              <option value="">Approval</option>
+              <option value="/admin/displayFaculty">Faculty Approval</option>
+              <option value="/admin/displayStudents">Student Approval</option>
+            </select>
+          </div>
           <button
-            className="inline-flex items-center bg-gray-800 border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0"
+            className="inline-flex items-center bg-indigo-500 border-0 py-2 px-4 ml-4 mt-4 md:mt-0 md:ml-6 rounded-md text-base font-medium text-white hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             onClick={logoutMain}
           >
             Logout
             <svg
               fill="none"
               stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               className="w-4 h-4 ml-1"
               viewBox="0 0 24 24"
             >
-              <path d="M5 12h14M12 5l7 7-7 7"></path>
+              <path d="M5 12h14"></path>
             </svg>
           </button>
-        </Link>
+          <button className="ml-4 p-2 rounded-full bg-gray-800 text-gray-100 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M16 20a4 4 0 00-4-4H8a4 4 0 00-4 4v1a4 4 0 004 4h4a4 4 0 004-4v-1z"
+              />
+            </svg>
+          </button>
+        </nav>
       </div>
     </header>
   );

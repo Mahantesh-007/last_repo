@@ -42,6 +42,6 @@ const fileSchema = mongoose.Schema(
   }
 );
 mongoose.models = {};
-const FileUpload = mongoose.model("File", fileSchema);
+const FileUpload = mongoose.model("FileUpload", fileSchema);
 
 export default FileUpload;

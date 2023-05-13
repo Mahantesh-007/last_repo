@@ -13,7 +13,7 @@ const FacultyUpload = ({ facultySubject }) => {
   const subjectid = id;
   const [filename, setFilename] = useState("");
   const [description, setDescription] = useState("");
-  const [code,setCode] = useState("")
+  const [code, setCode] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -21,7 +21,6 @@ const FacultyUpload = ({ facultySubject }) => {
     if (!token || token.isFaculty === true) {
       router.push("/Faculty/login");
     }
-    setAuthorId(decodedToken.id);
   }, [router]);
 
   const handleSubmit = async (e) => {
@@ -64,7 +63,7 @@ const FacultyUpload = ({ facultySubject }) => {
         console.log(responseData);
         setFilename("");
         setDescription("");
-        setCode("")
+        setCode("");
       } else {
         alert("error");
       }

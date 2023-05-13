@@ -13,7 +13,7 @@ const Login = () => {
     if (token) {
       const decodedToken = jwt_decode(token);
       if (decodedToken.isStudent === true) {
-        router.push("/Students/studentPanel");
+        router.push("/Students/displayDepartment");
       }
     }
   }, []);
@@ -27,7 +27,7 @@ const Login = () => {
       localStorage.setItem("token", res.data.token);
       setEmail("");
       setPassword("");
-      router.push("/Students/studentPanel");
+      router.push("/Students/displayDepartment");
       window.location.reload();
     }
   };

@@ -40,7 +40,7 @@ function displayStudent({ studentMembers }) {
         })};
         setTimeout(()=>(
           router.push("/admin/displayStudents")
-        ),2000);
+        ),1500);
      
       console.log(data);
     } catch (error) {

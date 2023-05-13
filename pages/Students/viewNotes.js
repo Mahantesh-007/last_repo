@@ -9,47 +9,47 @@ import Rate from "@/models/Rating";
 
 function extractDriveFileId(url) {
   if (url && typeof url === "string") {
-    const match = url.match(/[-\w]{25,}/);
-    if (match) {
-      return match[0];
+    const matchLocal = url.match(/^uploads\\[-\w]+\.pdf$/);
+    //const matchDrive = url.match(/[-\w]{25,}(?=[^/]*$)/);
+    if (matchLocal) {
+      console.log(matchLocal);
+      return (
+        <div>
+          <iframe
+            name="display-frame"
+            src={`../${matchLocal[0].replace(/\\/g, "/")}`}
+            className="w-100 h-56 border border-black"
+          />
+        </div>
+      );
+    } else {
+      const matchDrive = url.match(/[-\w]{25,}/)[0];
+      console.log(matchDrive);
+      return (
+        <div
+          className="pt-4"
+          style={{ display: "flex", justifyContent: "center" }}
+        >
+          <iframe
+            name="display-frame"
+            className=" aspect-square w-1/3"
+            src={`https://drive.google.com/file/d/${matchDrive}/preview`}
+          />
+        </div>
+      );
     }
   }
-  return null;
-}
-
-function DrivePreview({ fileId }) {
-  return (
-    <div>
-      {" "}
-      <iframe
-        name="display-frame"
-        src={`https://drive.google.com/file/d/${fileId}/preview`}
-        className="w-100 h-56 border border-black"
-      />
-    </div>
-  );
-}
-
-function OtherPreview({ path }) {
-  return (
-    <div>
-      {" "}
-      <iframe
-        name="display-frame"
-        src={path}
-        className="w-100 h-56 border border-black"
-      />
-    </div>
-  );
 }
 
 export default function ViewNotes({ totalRating }) {
   const router = useRouter();
   const { path, file } = router.query;
   const fileId = extractDriveFileId(path);
+  console.log(fileId);
+
   const [rating, setRating] = useState(0);
   const [authorId, setAuthorId] = useState("");
-  console.log(totalRating);
+
   const existingItem = totalRating.find(
     (item) => item.userId === authorId && item.file === file
   );
@@ -69,7 +69,6 @@ export default function ViewNotes({ totalRating }) {
           userId: authorId,
         })
         .then((response) => {
-          console.log(response.data);
           window.location.reload();
         });
     }
@@ -84,7 +83,6 @@ export default function ViewNotes({ totalRating }) {
           userId: authorId,
         })
         .then((response) => {
-          console.log(response.data);
           window.location.reload();
         });
     }
@@ -93,15 +91,18 @@ export default function ViewNotes({ totalRating }) {
   const showStar = totalRating.some(
     (item) => authorId === item.userId && file === item.file
   ) ? (
-    <Rating
-      emptySymbol={<FaRegStar className="text-gray-400" size={28} />}
-      fullSymbol={<FaStar className="text-yellow-400" size={28} />}
-      fractions={2}
-      initialRating={existingItem.rating}
-      onClick={(rate) => (
-        setRating(rate), handleUpdate(rate, existingItem._id)
-      )}
-    />
+    <div className="pt-4" style={{ display: "flex", justifyContent: "center" }}>
+      <Rating
+        className="items-center justify-center"
+        emptySymbol={<FaRegStar className="text-gray-400" size={28} />}
+        fullSymbol={<FaStar className="text-yellow-400" size={28} />}
+        fractions={2}
+        initialRating={existingItem.rating}
+        onClick={(rate) => (
+          setRating(rate), handleUpdate(rate, existingItem._id)
+        )}
+      />
+    </div>
   ) : (
     <Rating
       emptySymbol={<FaRegStar className="text-gray-400" size={28} />}
@@ -112,20 +113,22 @@ export default function ViewNotes({ totalRating }) {
     />
   );
 
-  if (fileId) {
-    return (
-      <section>
-        <div>
-          <DrivePreview fileId={fileId} />
-        </div>
-        {showStar}
+  return (
+    <section>
+      <div>
+        <div>{extractDriveFileId(path)}</div>
+      </div>
+      {showStar}
 
-        <p>Rating: {rating || existingItem?.rating || "No rating found"}</p>
-      </section>
-    );
-  } else {
-    return <OtherPreview path={path} />;
-  }
+      <p
+        div
+        className="pt-2"
+        style={{ display: "flex", justifyContent: "center" }}
+      >
+        Rating: {rating || existingItem?.rating || "No rating found"}
+      </p>
+    </section>
+  );
 }
 
 export async function getServerSideProps(context) {
@@ -143,7 +146,7 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        totalRating: ratingDone, // Corrected key name
+        totalRating: ratingDone,
       },
     };
   } catch (error) {

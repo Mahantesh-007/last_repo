@@ -11,6 +11,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Button } from '@mui/material';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function displayFaculty({facultyMembers}) {
 
@@ -52,6 +54,21 @@ function displayFaculty({facultyMembers}) {
             body: JSON.stringify({})
           });
           const data = await response.json();
+          
+      if (response.ok) {
+        toast.success("Success", {
+          position: "top-center",
+          autoClose: 500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        })};
+        setTimeout(()=>(
+          router.push("/admin/displayFaculty")
+        ),1500);
           console.log(data);
         } catch (error) {
           console.error(error);
@@ -79,6 +96,20 @@ function displayFaculty({facultyMembers}) {
       
       
   return (
+    <>
+    <ToastContainer
+        position="top-center"
+        autoClose={500}
+        limit={1}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     <TableContainer component={Paper}>
     <Table sx={{ minWidth: 700 }} aria-label="customized table">
       <TableHead>
@@ -114,6 +145,7 @@ function displayFaculty({facultyMembers}) {
       </TableBody>
     </Table>
   </TableContainer>
+  </>
 );
 }
 export default displayFaculty

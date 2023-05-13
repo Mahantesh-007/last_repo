@@ -4,6 +4,8 @@ import AdminHead from "@/components/AdminHeader";
 import { useState, useEffect } from "react";
 import jwt_decode from "jwt-decode";
 import FacultyHead from "@/components/FacultyHeader";
+import StudentHead from "@/components/StudentHeader";
+import Footer from "@/components/Footer";
 
 
 export default function App({ Component, pageProps }) {
@@ -31,6 +33,7 @@ export default function App({ Component, pageProps }) {
     <>
       {userRole === "admin" && <AdminHead />}
       {userRole === "faculty" && <FacultyHead/>}
+      {userRole === "student" && <StudentHead/>}
       {userRole === "" && <Navbar/>}
       <Component {...pageProps} />
     </>

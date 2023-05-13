@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-const FacultyHead = () => {
+const StudentHead = () => {
   const router = useRouter();
   function navigateToPage(event) {
     router.push(event.target.value);
@@ -9,7 +9,7 @@ const FacultyHead = () => {
 
   const logoutMain = (e) => {
     localStorage.removeItem("token");
-    router.push("/Faculty/login");
+    router.push("/Students/login");
     window.location.reload();
   };
 
@@ -24,7 +24,7 @@ const FacultyHead = () => {
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            className="w-10 h-10 text-white p-2 bg-red-500 rounded-full"
+            className="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full"
             viewBox="0 0 24 24"
           >
             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
@@ -32,11 +32,11 @@ const FacultyHead = () => {
           <span className="ml-3 text-xl">Pentagon</span>
         </a>
         <nav className="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-700	flex flex-wrap items-center text-base justify-center"></nav>
-        <select onChange={navigateToPage}>
+        {/* <select onChange={navigateToPage}>
           <option value="">Approval</option>
           <option value="/Faculty/facultyUpload">Upload</option>
          
-        </select>
+        </select> */}
 
         <Link href="/Faculty/login">
           <button
@@ -62,4 +62,4 @@ const FacultyHead = () => {
   );
 };
 
-export default FacultyHead;
+export default StudentHead;
