@@ -61,7 +61,7 @@ const Chatbot = () => {
       user: true,
       validator: (value) => {
         if (!value) {
-          return "Thikka muchkond type madu";
+          return "Searching";
         }
         setRequired(value);
         return true;
@@ -70,7 +70,7 @@ const Chatbot = () => {
     },
     {
       id: "5",
-      message: `Hi {previousValue}! ninge ${required} beka library hogi hudku LOWDE`,
+      message: `Hi {previousValue}! Sorry`,
       end: true,
     },
   ];

@@ -23,7 +23,6 @@ const displaySubject = ({ subjectFind }) => {
     (subject) => subject.department === departmentid
   );
 
-  // If search query is present, filter the data by subject name
   const subjectDisplayed = searchQuery
     ? filteredData.filter((subject) =>
         subject.subjectname.toLowerCase().includes(searchQuery.toLowerCase())
@@ -93,6 +92,7 @@ export async function getServerSideProps(context) {
       subjectname: member.subjectname || "",
       code: member.code,
       department: member.department,
+      semester: member.semester,
     }));
 
     return {

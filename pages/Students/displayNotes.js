@@ -4,8 +4,11 @@ import connectDB from "@/middleware/db";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import FileUpload from "@/models/File";
+import Rating from "react-rating";
+import Rate from "@/models/Rating";
+import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 
-const displayNotes = ({ findNotes, findFile }) => {
+const displayNotes = ({ findNotes, findFile, rating }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const { id } = router.query;
@@ -58,16 +61,55 @@ const displayNotes = ({ findNotes, findFile }) => {
       .map((notes) => notes.filename)
   );
 
+
+  const averageRatings = notesInSubject.map((notes) => {
+    const averageRating =
+      rating
+        .filter((item) => item._id === notes._id)
+        .reduce((total, items) => total + items.rating, 0) /
+      (rating.filter((item) => item._id === notes._id).length * 5);
+    
+    return averageRating;
+  });
+  
   return (
     <section class="text-gray-600 body-font">
-      <div>
-        <input
-          type="text"
-          placeholder="Search"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
+      <form>
+        <label
+          for="default-search"
+          class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+        >
+          Search
+        </label>
+        <div class="relative mt-4 mx-auto w-2/6">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <svg
+              aria-hidden="true"
+              class="w-5 h-5 text-gray-500 dark:text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
+            </svg>
+          </div>
+          <input
+            type="search"
+            id="default-search"
+            class="block w-full h-10 p-4 pl-10 text-sm text-gray-500 border border-gray-500 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-50 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            required
+          />
+        </div>
+      </form>
       <div class="container px-5 py-24 mx-auto">
         <div class="flex flex-wrap -m-4">
           {filteredData.length > 0 &&
@@ -92,6 +134,22 @@ const displayNotes = ({ findNotes, findFile }) => {
                     >
                       Preview
                     </Link>
+                    <div>
+                      {rating
+                        .filter((item) => item._id == notes._id)
+                        .map((items) => items.rating)}
+                      <Rating
+                        className="items-center justify-center"
+                        emptySymbol={
+                          <FaRegStar className="text-gray-400" size={28} />
+                        }
+                        fullSymbol={
+                          <FaStar className="text-yellow-400" size={28} />
+                        }
+                        fractions={2}
+                        initialRating={averageRatings} 
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
@@ -114,6 +172,21 @@ const displayNotes = ({ findNotes, findFile }) => {
                 >
                   Preview
                 </Link>
+                <div>
+                  {rating
+                    .filter((item) => item._id == items._id)
+                    .map((items) => items.rating)}
+                  <Rating
+                    className="items-center justify-center"
+                    emptySymbol={
+                      <FaRegStar className="text-gray-400" size={28} />
+                    }
+                    fullSymbol={
+                      <FaStar className="text-yellow-400" size={28} />
+                    }
+                    fractions={2}
+                  />
+                </div>
               </div>
             </div>
           ))}
@@ -130,6 +203,14 @@ export async function getServerSideProps(context) {
     await connectDB();
     const findNotes = await File.find({});
     const findFile = await FileUpload.find({});
+    const rating = await Rate.find({}, { isRated: 0 });
+
+    const userRating = rating.map((item) => ({
+      _id: item.id,
+      userId: item.userId,
+      file: item.file,
+      rating: item.rating,
+    }));
 
     const notesDisplayed = findNotes.map((member) => ({
       _id: member.id || "",
@@ -157,6 +238,7 @@ export async function getServerSideProps(context) {
       props: {
         findNotes: notesDisplayed,
         findFile: fileDisplayed,
+        rating: userRating,
       },
     };
   } catch (error) {
@@ -165,6 +247,7 @@ export async function getServerSideProps(context) {
       props: {
         findNotes: [],
         findFile: [],
+        rating: [],
       },
     };
   }

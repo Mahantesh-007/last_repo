@@ -10,13 +10,12 @@ export default async function handler(req, res) {
     const { email, password } = req.body;
 
     try {
-      // Check if admin exists in the database
+     
       const admin = await Register.findOne({ email });
       if (!admin) {
         return res.status(401).json({ success: false, message: "Invalid credentials" });
       }
 
-      // Check if user is admin
       if (!admin.isAdmin) {
         return res.status(401).json({ success: false, message: "Unauthorized access" });
       }
@@ -29,7 +28,7 @@ export default async function handler(req, res) {
         return res.status(401).json({ success: false, message: "Invalid credentials" });
       }
 
-      // Create and send JWT token
+  
       const payload = {
         id: admin.id,
         isAdmin: admin.isAdmin,
@@ -48,6 +47,11 @@ export default async function handler(req, res) {
         }
       );
     } catch (error) {
+      if (error.response && error.response.status === 401) {
+        const errorMessage = error.response.data.message;
+        console.log(errorMessage);
+        return res.status(401).json({ success: false, message: errorMessage });
+      }
       console.error(error.message);
       res.status(500).json({ success: false, message: "Server Error" });
     }

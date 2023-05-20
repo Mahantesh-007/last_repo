@@ -1,56 +1,74 @@
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
-import FileUpload from "@/models/File";
 import File from "@/models/Upload";
+import FileUpload from "@/models/File";
 import connectDB from "@/middleware/db";
 import jwt_decode from "jwt-decode";
+import { useState } from "react";
+import { useEffect } from "react";
 
-const uploadedNotes = ({ findNote, findFiles }) => {
-  console.log(findFiles);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [myToken, setMyToken] = useState("");
-
+const uploadedNotes = ({ findNotes, findFile }) => {
   const router = useRouter();
+  const [authorid, setAuthorid] = useState("");
   const { id } = router.query;
   const subjectid = id;
+
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      const decodedToken = jwt_decode(token);
-      setMyToken(decodedToken.id);
-    }
-  }, []);
-  // notesInSubject = findNote.filter((notes) => notes.code === subjectid);
-  // filesInSubject = findFiles.filter((files) => files.code === subjectid);
+    const decodedToken = jwt_decode(token);
+    setAuthorid(decodedToken.id);
+  }, [router]);
 
-  // if (searchQuery) {
-  //   notesInSubject = filteredData;
-  // } else {
-  //   notesInSubject = findNote;
-  // }
-  // console.log(
-  //   notesInSubject
-  //     .filter((item) => item.code === subjectid)
-  //     .map((notes) => notes.filename)
-  // );
   return (
-    <div>
-      <div>
-        {findNote
-          .filter(
-            (notes) => notes.subject === subjectid && notes.author == myToken
-          )
-          .map((item) => (
-            <div>{item.subject}</div>
-          ))}
+    <>
+      <div class="container px-5 py-24 mx-auto">
+        <div class="flex flex-wrap -m-4">
+          {findNotes
+            .filter((notes) => notes.author === authorid)
+            .map((notes) => (
+              <div key={notes._id} class="xl:w-1/3 md:w-1/2 p-4">
+                <div class="border border-gray-200 p-6 rounded-lg">
+                  <Link
+                    href={notes.filename}
+                    class="text-lg text-gray-900 font-medium title-font mb-2"
+                  >
+                    {notes.description}
+                  </Link>
+                  <p class="leading-relaxed text-base">{notes.description}</p>
+                  <Link
+                    href={{
+                      pathname: "/Faculty/viewNotes",
+                      query: { path: `${notes.filename}`, file: notes._id },
+                    }}
+                    class="text-indigo-500 inline-flex items-center"
+                  >
+                    Preview
+                  </Link>
+                </div>
+              </div>
+            ))}
+        </div>
       </div>
-      {/* <div>
-        {findFiles.map((item) => (
-          <div>{item.subject}</div>
-        ))}
-      </div> */}
-    </div>
+      <Link
+        href={{
+          pathname: "/Faculty/facultyUpload",
+          query: { id: subjectid },
+        }}
+        className="text-indigo-500 inline-flex items-center"
+      >
+        Upload
+      </Link>
+      <Link
+        href={{
+          pathname: "/Faculty/fileUpload",
+          query: { id: subjectid },
+        }}
+        className="text-indigo-500 inline-flex items-center"
+      >
+        Upload
+      </Link>
+    </>
   );
 };
 
@@ -59,10 +77,10 @@ export default uploadedNotes;
 export async function getServerSideProps(context) {
   try {
     await connectDB();
-    const findNote = await File.find({});
-    const findFiles = await FileUpload.find({});
+    const findNotes = await File.find({});
+    const findFile = await FileUpload.find({});
 
-    const noteDisplayed = findNote.map((member) => ({
+    const notesDisplayed = findNotes.map((member) => ({
       _id: member.id || "",
       filename: member.filename || "",
       description: member.description || "",
@@ -72,7 +90,7 @@ export async function getServerSideProps(context) {
       author: member.author || "",
     }));
 
-    const filesDisplayed = findFiles.map((filesend) => ({
+    const fileDisplayed = findFile.map((filesend) => ({
       _id: filesend.id || "",
       title: filesend.title || "",
       description: filesend.description || "",
@@ -86,16 +104,16 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        findNote: noteDisplayed,
-        findFiles: filesDisplayed,
+        findNotes: notesDisplayed,
+        findFile: fileDisplayed,
       },
     };
   } catch (error) {
     console.error(error.message);
     return {
       props: {
-        findNote: [],
-        findFiles: [],
+        findNotes: [],
+        findFile: [],
       },
     };
   }

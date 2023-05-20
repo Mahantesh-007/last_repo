@@ -7,7 +7,6 @@ import FacultyHead from "@/components/FacultyHeader";
 import StudentHead from "@/components/StudentHeader";
 import Footer from "@/components/Footer";
 
-
 export default function App({ Component, pageProps }) {
   const [userRole, setUserRole] = useState("");
   useEffect(() => {
@@ -16,28 +15,24 @@ export default function App({ Component, pageProps }) {
       const decodedToken = jwt_decode(token);
       if (decodedToken.isAdmin) {
         setUserRole("admin");
-        
       } else if (decodedToken.isFaculty) {
         setUserRole("faculty");
       } else if (decodedToken.isStudent) {
         setUserRole("student");
-        
-        
       }
     } else {
       setUserRole("");
     }
   }, []); // Add userRole as a dependency
-  
+
   return (
     <>
       {userRole === "admin" && <AdminHead />}
-      {userRole === "faculty" && <FacultyHead/>}
-      {userRole === "student" && <StudentHead/>}
-      {userRole === "" && <Navbar/>}
+      {userRole === "faculty" && <FacultyHead />}
+      {userRole === "student" && <StudentHead />}
+      {userRole === "" && <Navbar />}
       <Component {...pageProps} />
+      {/* <Footer/> */}
     </>
   );
-
 }
-

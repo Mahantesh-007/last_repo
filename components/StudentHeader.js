@@ -10,7 +10,7 @@ const StudentHead = () => {
   const logoutMain = (e) => {
     localStorage.removeItem("token");
     router.push("/Students/login");
-    window.location.reload();
+    
   };
 
   return (

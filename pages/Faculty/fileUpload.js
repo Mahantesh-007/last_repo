@@ -5,40 +5,45 @@ import Dropzone from "react-dropzone";
 import axios from "axios";
 import { Form, Row, Col, Button } from "react-bootstrap";
 import { useRouter } from "next/router";
-import connectDB from "@/middleware/db";
-import Subjects from "@/models/Subject";
 import jwt_decode from "jwt-decode";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home({ facultySub }) {
+export default function Home() {
   const router = useRouter();
   const { id } = router.query;
   const subjectid = id;
-  const [file, setFile] = useState(null); // state for storing actual image
-  const [previewSrc, setPreviewSrc] = useState(""); // state for storing previewImage
+  const [file, setFile] = useState(null);
+  const [previewSrc, setPreviewSrc] = useState("");
+  const [author, setAuthor] = useState("");
+  const [departmentid, setDepartmentid] = useState("");
   const [title, setTitle] = useState("");
-  const [state, setState] = useState({
-    description: "",
-    code: "",
-  });
+  const [description, setDescription] = useState("");
+  const [code, setCode] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [isPreviewAvailable, setIsPreviewAvailable] = useState(false); // state to show preview only for images
-  const dropRef = useRef(); // React ref for managing the hover state of droppable area
-
+  const [isPreviewAvailable, setIsPreviewAvailable] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const dropRef = useRef();
+  console.log(code);
+  console.log(title);
+  console.log(description);
   useEffect(() => {
     const token = localStorage.getItem("token");
     const decodedToken = jwt_decode(token);
-    if (!token || token.isFaculty === true) {
+    if (!token || decodedToken.isFaculty == false) {
+      console.log(decodedToken);
       router.push("/Faculty/login");
+    } else {
+      setAuthor(decodedToken.id);
+      setDepartmentid(decodedToken.department);
     }
   }, [router]);
 
-  const handleInputChange = (event) => {
-    setState({
-      ...state,
-      [event.target.name]: event.target.value,
-    });
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    }
   };
 
   const onDrop = (files) => {
@@ -51,6 +56,7 @@ export default function Home({ facultySub }) {
     };
     fileReader.readAsDataURL(uploadedFile);
     setIsPreviewAvailable(uploadedFile.name.match(/\.(jpeg|jpg|png)$/));
+    dropRef.current.style.border = "2px dashed #e9ebeb";
   };
 
   const updateBorder = (dragState) => {
@@ -63,42 +69,37 @@ export default function Home({ facultySub }) {
 
   const handleOnSubmit = async (event) => {
     event.preventDefault();
-    const token = localStorage.getItem("token");
-    const decodedToken = jwt_decode(token);
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("code", code);
+    formData.append("subject", subjectid);
+    formData.append("department", departmentid);
+    formData.append("author", author);
 
     try {
-      const { title, description, code } = state;
-      if (title.trim() !== "" && description.trim() !== "") {
-        if (file) {
-          const formData = new FormData();
-          formData.append("file", file);
-          formData.append("title", title);
-          formData.append("description", description);
-          formData.append("code", code);
+      const response = await fetch(`/api/faculty/fileUpload`, {
+        method: "POST",
+        body: formData,
+      });
 
-          formData.append("subject", subjectid);
-          formData.append("department", decodedToken.department);
-          formData.append("author", decodedToken.id);
+      console.log(...formData);
 
-          setErrorMsg("");
-          await axios.post(`/api/faculty/fileUpload`, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
-          setFile(null);
-          setPreviewSrc("");
-          setTitle("");
-          setState({
-            description: "",
-            code: "",
-          });
-        } else {
-          setErrorMsg("Please select a file to add.");
-        }
+      if (response.ok) {
+        console.log("hi");
       } else {
-        setErrorMsg("Please enter all the field values.");
+        const data = await response.json();
+        console.log(data);
       }
+      // setFile(null);
+      // setPreviewSrc("");
+      // setState({
+      //   // title: "",
+      //   // description: "",
+      //   // code: "",
+      // });
     } catch (error) {
       error.response && setErrorMsg(error.response.data);
     }
@@ -112,130 +113,130 @@ export default function Home({ facultySub }) {
             <h2 className="text-gray-900 text-2xl mb-4 font-medium title-font text-center">
               Upload The File
             </h2>
-            <form action="" onSubmit={handleOnSubmit}>
+            <Form className="search-form" onSubmit={handleOnSubmit}>
               {errorMsg && <p className="errorMsg">{errorMsg}</p>}
               <div className="relative mb-4">
-                <label
-                  htmlFor="filename"
-                  className="leading-7 text-sm text-gray-600"
-                >
-                  Enter Title
-                </label>
-                <input
-                  onChange={(event) => setTitle(event.target.value)}
-                  value={title}
-                  type="text"
-                  id="filename"
-                  name="filename"
-                  className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-                />
-              </div>
-              <div className="relative mb-4">
-                <label
-                  htmlFor="description"
-                  className="leading-7 text-sm text-gray-600"
-                >
-                  Description
-                </label>
-                <textarea
-                  onChange={handleInputChange}
-                  value={state.description || ""}
-                  id="description"
-                  name="description"
-                  className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-20 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
-                ></textarea>
-              </div>
-
-              <div className="relative mb-4">
-                <label
-                  htmlFor="code"
-                  className="leading-7 text-sm text-gray-600"
-                >
-                  Subject Code
-                </label>
-                <textarea
-                  onChange={handleInputChange}
-                  value={state.code || ""}
-                  id="code"
-                  name="code"
-                  className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-20 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
-                ></textarea>
-              </div>
-
-              <div>
-                <label htmlFor="dropzone-file">
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <svg
-                      aria-hidden="true"
-                      className="w-10 h-10 mb-3 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
+                <Row>
+                  <Col>
+                    <label
+                      htmlFor="title"
+                      className="leading-7 text-sm text-gray-600"
                     >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                      ></path>
-                    </svg>
-                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                      <span className="font-semibold">Click to upload</span> or
-                      drag and drop
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      SVG, PNG, JPG or GIF (MAX. 800x400px)
-                    </p>
-                  </div>
+                      Enter Title
+                    </label>
+                    <Form.Group controlId="title">
+                      <Form.Control
+                        type="text"
+                        name="title"
+                        value={title || ""}
+                        placeholder="Enter title"
+                        onChange={(e) => {
+                          setTitle(e.target.value);
+                        }}
+                        className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </div>
+              <div className="relative mb-4">
+                <Row>
+                  <Col>
+                    <label
+                      htmlFor="description"
+                      className="leading-7 text-sm text-gray-600"
+                    >
+                      Enter Description
+                    </label>
+                    <Form.Group controlId="description">
+                      <Form.Control
+                        type="text"
+                        name="description"
+                        value={description || ""}
+                        placeholder="Enter description"
+                        onChange={(e) => {
+                          setDescription(e.target.value);
+                        }}
+                        className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 h-20 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </div>
+              <div className="relative mb-4">
+                <Row>
+                  <Col>
+                    <label
+                      htmlFor="code"
+                      className="leading-7 text-sm text-gray-600"
+                    >
+                      Enter Code
+                    </label>
+                    <Form.Group controlId="code">
+                      <Form.Control
+                        type="text"
+                        name="code"
+                        value={code || ""}
+                        placeholder="Enter Subject Code"
+                        onChange={(e) => {
+                          setCode(e.target.value);
+                        }}
+                        className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </div>
+              <div className="upload-section">
+                <label
+                  htmlFor="file"
+                  className="flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  
+                  <span>Upload File</span>
+
                   <input
-                    id="dropzone-file"
-                    type="file"
                     className="hidden"
-                    onChange={(e) => onDrop(e.target.files)}
+                    type="file"
+                    id="file"
+                    name="file"
+                    onChange={handleImageChange}
                   />
                 </label>
-                {file && <div>Selected file: {file.name}</div>}
+
+                {previewSrc ? (
+                  isPreviewAvailable ? (
+                    <div className="image-preview">
+                      <img
+                        className="preview-image"
+                        src={previewSrc}
+                        alt="Preview"
+                      />
+                    </div>
+                  ) : (
+                    <div className="preview-message">
+                      <p>No preview available for this file</p>
+                    </div>
+                  )
+                ) : (
+                  <div className="preview-message">
+                    <p>Image preview will be shown here after selection</p>
+                  </div>
+                )}
               </div>
-              <div className="flex justify-center">
-                <button className="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg my-5 ">
-                  Upload Data
-                </button>
+              <div className="flex justify-centre">
+                <Button
+                  variant="primary"
+                  type="submit"
+                  className="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg my-5"
+                >
+                  Submit
+                </Button>
               </div>
-              {/* <p className="text-xs text-gray-500 mt-3">Chicharrones blog helvetica normcore iceland tousled brook viral artisan.</p> */}
-            </form>
+            </Form>
           </div>
         </div>
       </section>
     </>
   );
-}
-
-export async function getServerSideProps(context) {
-  try {
-    await connectDB();
-
-    const facultySub = await Subjects.find({});
-
-    const subjectDisplay = facultySub.map((item) => ({
-      _id: item.id ? item.id : "",
-      subjectname: item.subjectname ? item.subjectname : "",
-      code: item.code ? item.code : "",
-      department: item.department ? item.department : "",
-      authorId: item.authorId ? item.authorId : "",
-    }));
-
-    return {
-      props: {
-        facultySub: subjectDisplay,
-      },
-    };
-  } catch (error) {
-    console.error(error.message);
-    return {
-      props: {
-        facultySub: [],
-      },
-    };
-  }
 }

@@ -18,7 +18,7 @@ const fileSchema = mongoose.Schema(
     },
     file_mimetype: {
       type: String,
-      required: true,
+      required: false,
     },
     subject: {
       type: String,

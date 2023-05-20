@@ -14,14 +14,11 @@ function extractDriveFileId(url) {
     if (matchLocal) {
       console.log(matchLocal);
       return (
-        <div
-          className="pt-4"
-          style={{ display: "flex", justifyContent: "center" }}
-        >
+        <div>
           <iframe
             name="display-frame"
             src={`../${url.slice(7)}`}
-            className="aspect-square w-1/3 border border-black"
+            className="w-100 h-56 border border-black"
           />
         </div>
       );
@@ -34,7 +31,7 @@ function extractDriveFileId(url) {
         >
           <iframe
             name="display-frame"
-            className=" aspect-square w-1/3 border border-black"
+            className=" aspect-square w-1/3"
             src={`https://drive.google.com/file/d/${matchDrive}/preview`}
           />
         </div>
@@ -107,14 +104,14 @@ export default function ViewNotes({ totalRating }) {
     </div>
   ) : (
     <div className="pt-4" style={{ display: "flex", justifyContent: "center" }}>
-      <Rating
-        className="items-center justify-center"
-        emptySymbol={<FaRegStar className="text-gray-400" size={28} />}
-        fullSymbol={<FaStar className="text-yellow-400" size={28} />}
-        fractions={2}
-        initialRating={rating}
-        onClick={(rate) => (setRating(rate), handleRating(rate))}
-      />
+    <Rating
+    className="items-center justify-center"
+      emptySymbol={<FaRegStar className="text-gray-400" size={28} />}
+      fullSymbol={<FaStar className="text-yellow-400" size={28} />}
+      fractions={2}
+      initialRating={rating}
+      onClick={(rate) => (setRating(rate), handleRating(rate))}
+    />
     </div>
   );
 

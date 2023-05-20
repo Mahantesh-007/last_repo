@@ -4,17 +4,19 @@ const multer = require("multer");
 import connectDB from "@/middleware/db";
 
 const upload = multer({
-  dest: "/uploads/",
+  dest: "public/uploads/",
   storage: multer.diskStorage({
     destination(req, file, cb) {
-      cb(null, "./uploads");
+      cb(null, "./public/uploads");
     },
     filename(req, file, cb) {
-      cb(null, `${new Date().getTime()}_${file.originalname}`);
+      const originalname = file.originalname;
+      const filename = originalname.replace(/\s+/g, "_").replace(/[\s()+\[\]{}.|!@%]/g, "_");
+      cb(null, `${new Date().getTime()}_${filename}`);
     },
   }),
   limits: {
-    fileSize: 1000000000, // max file size 1MB = 1000000 bytes
+    fileSize: 1000000000, 
   },
   fileFilter(req, file, cb) {
     if (!file.originalname.match(/\.(jpeg|jpg|png|pdf|doc|docx|xlsx|xls)$/)) {
@@ -24,22 +26,20 @@ const upload = multer({
         )
       );
     }
-    cb(undefined, true); // continue with upload
+    cb(undefined, true); 
   },
 });
 
 export const config = {
   api: {
-    bodyParser: false, // Disable automatic body parsing
+    bodyParser: false, 
   },
 };
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
     try {
-      console.log("debug1");
       connectDB();
-      console.log("debug2");
       await new Promise((resolve, reject) => {
         upload.single("file")(req, res, (error) => {
           if (error) {
@@ -49,19 +49,20 @@ export default async function handler(req, res) {
           }
         });
       });
-      const { title, description, subject, code, department, author } =
-        req.body;
-      const { path, mimetype } = req.file;
+      
+      const { title, description, subject, code, department, author  } = req.body;
+      const { path, type } = req.file;
       const file = new FileUpload({
         title,
         description,
-        file_path: path,
-        file_mimetype: mimetype,
         subject,
         code,
         department,
         author,
+        file_path: path,
+        file_mimetype: type || "",
       });
+
       console.log(file);
       await file.save();
       res.send("file uploaded successfully.");
