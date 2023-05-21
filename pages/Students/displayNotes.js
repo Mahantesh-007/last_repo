@@ -61,17 +61,16 @@ const displayNotes = ({ findNotes, findFile, rating }) => {
       .map((notes) => notes.filename)
   );
 
-
-  const averageRatings = notesInSubject.map((notes) => {
-    const averageRating =
-      rating
-        .filter((item) => item._id === notes._id)
-        .reduce((total, items) => total + items.rating, 0) /
-      (rating.filter((item) => item._id === notes._id).length * 5);
-    
+  function myRating(id) {
+    const fileRatings = rating.filter((item) => item.file === id);
+    const totalRating = fileRatings.reduce(
+      (total, item) => parseFloat(total) + parseFloat(item.rating),
+      0
+    );
+    const averageRating = parseFloat(totalRating) / fileRatings.length;
     return averageRating;
-  });
-  
+  }
+
   return (
     <section class="text-gray-600 body-font">
       <form>
@@ -125,30 +124,32 @@ const displayNotes = ({ findNotes, findFile, rating }) => {
                       {notes.description}
                     </Link>
                     <p class="leading-relaxed text-base">{notes.description}</p>
-                    <Link
-                      href={{
-                        pathname: "/Students/viewNotes",
-                        query: { path: `${notes.filename}`, file: notes._id },
-                      }}
-                      class="text-indigo-500 inline-flex items-center"
-                    >
-                      Preview
-                    </Link>
-                    <div>
-                      {rating
-                        .filter((item) => item._id == notes._id)
-                        .map((items) => items.rating)}
-                      <Rating
-                        className="items-center justify-center"
-                        emptySymbol={
-                          <FaRegStar className="text-gray-400" size={28} />
-                        }
-                        fullSymbol={
-                          <FaStar className="text-yellow-400" size={28} />
-                        }
-                        fractions={2}
-                        initialRating={averageRatings} 
-                      />
+                    <div className="flex items-center justify-between">
+                      <Link
+                        href={{
+                          pathname: "/Students/viewNotes",
+                          query: { path: `${notes.filename}`, file: notes._id },
+                        }}
+                        className="text-indigo-500 inline-flex items-center mr-4"
+                      >
+                        Preview
+                      </Link>
+                      <div className="flex items-center justify-end">
+                        {rating.filter((item) => item.file === notes._id)
+                          .length || "0"}
+                        <Rating
+                          className="items-center justify-center ml-2"
+                          emptySymbol={
+                            <FaRegStar className="text-gray-400" size={14} />
+                          }
+                          fullSymbol={
+                            <FaStar className="text-yellow-400" size={14} />
+                          }
+                          fractions={2}
+                          initialRating={myRating(notes._id)}
+                          readonly={true}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -163,29 +164,31 @@ const displayNotes = ({ findNotes, findFile, rating }) => {
                   {items.title}
                 </Link>
                 <p class="leading-relaxed text-base">{items.description}</p>
-                <Link
-                  href={{
-                    pathname: "/Students/viewNotes",
-                    query: { path: `${items.file_path}`, file: items._id },
-                  }}
-                  class="text-indigo-500 inline-flex items-center"
-                >
-                  Preview
-                </Link>
-                <div>
-                  {rating
-                    .filter((item) => item._id == items._id)
-                    .map((items) => items.rating)}
-                  <Rating
-                    className="items-center justify-center"
-                    emptySymbol={
-                      <FaRegStar className="text-gray-400" size={28} />
-                    }
-                    fullSymbol={
-                      <FaStar className="text-yellow-400" size={28} />
-                    }
-                    fractions={2}
-                  />
+                <div className="flex items-center justify-between">
+                  <Link
+                    href={{
+                      pathname: "/Students/viewNotes",
+                      query: { path: `${items.file_path}`, file: items._id },
+                    }}
+                    class="text-indigo-500 inline-flex items-center"
+                  >
+                    Preview
+                  </Link>
+                  <div className="flex items-center justify-end">
+                    {rating.filter((item) => item.file === items._id).length || "0"}
+                    <Rating
+                      className="items-center justify-center ml-2"
+                      emptySymbol={
+                        <FaRegStar className="text-gray-400" size={14} />
+                      }
+                      fullSymbol={
+                        <FaStar className="text-yellow-400" size={14} />
+                      }
+                      fractions={2}
+                      initialRating={myRating(items._id)}
+                      readonly={true}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

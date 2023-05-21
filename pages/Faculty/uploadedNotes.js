@@ -50,24 +50,7 @@ const uploadedNotes = ({ findNotes, findFile }) => {
             ))}
         </div>
       </div>
-      <Link
-        href={{
-          pathname: "/Faculty/facultyUpload",
-          query: { id: subjectid },
-        }}
-        className="text-indigo-500 inline-flex items-center"
-      >
-        Upload
-      </Link>
-      <Link
-        href={{
-          pathname: "/Faculty/fileUpload",
-          query: { id: subjectid },
-        }}
-        className="text-indigo-500 inline-flex items-center"
-      >
-        Upload
-      </Link>
+      
     </>
   );
 };
