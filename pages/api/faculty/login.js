@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       let checkPassword = CryptoJS.AES.decrypt(myPassForNow, process.env.NEXT_PUBLIC_KEY).toString(CryptoJS.enc.Utf8);
 
       if (password !== checkPassword) {
-        return res.status(401).json({ success: false, message: "Invalid credentials" });
+        return res.status(402).json({ success: false, message: "Invalid credentials" });
       }
 
       const payload = {
@@ -49,9 +49,14 @@ export default async function handler(req, res) {
       );
     } catch (error) {
       console.error(error.message);
+      if (error.response && error.response.status === 401) {
+        return res.status(401).send("Unauthorized access");
+      }
+      else if(error.message && error.response.status === 402){
+        return res.status(402).send("Invalid credentials")
+      }
       res.status(500).json({ success: false, message: "Server Error" });
     }
-  } else {
-    res.status(400).json({ success: false });
   }
 }
+    

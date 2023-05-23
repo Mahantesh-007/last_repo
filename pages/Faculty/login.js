@@ -4,10 +4,14 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import jwt_decode from "jwt-decode";
 import Footer from "@/components/Footer";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const route = useRouter();
  
   useEffect(() => {
@@ -23,22 +27,46 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await axios.post("/api/faculty/login", {
-      email,
-      password,
-    });
-  if (res.status === 200) {
-    localStorage.setItem("token", res.data.token);
+    const setErrorMessage = (message) => {
+      toast.error(message, {
+        position: toast.POSITION.TOP_CENTER,
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    };
+    try {
+      const res = await axios.post("/api/faculty/login", {
+        email,
+        password,
+      });
     
-    route.push("/Faculty/facultyPanel");
+      if (res.status === 200) {
+        localStorage.setItem("token", res.data.token);
+        route.push("/Faculty/facultyPanel");
+        setEmail("");
+        setPassword("");
+      } else {
+        setErrorMessage("Invalid Credentials");
+      }
+    } catch (error) {
     
+      if (error.response && error.response.status === 401) {
+        setErrorMessage("Unauthorized access");
+      }else if(error.response && error.response.status === 402){
+        setErrorMessage("Invalid Credentials");
+      }
+       else if (error.response && error.response.data) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage("An error occurred. Please try again later.");
+      }
+    }
   }
-  setEmail("");
-  setPassword("");
-}
     
- 
-
   return (
     <div>
       <div
@@ -52,6 +80,8 @@ const Login = () => {
       <div className="max-w-md w-full px-6 py-12 bg-white bg-opacity-90 rounded-md shadow-md">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">Login Faculty</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
+        {errorMessage && <p>{errorMessage}</p>}
+        <ToastContainer />
           <div>
             <label htmlFor="email" className="block text-gray-700 font-bold">
               Email
