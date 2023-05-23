@@ -11,7 +11,7 @@ const upload = multer({
     },
     filename(req, file, cb) {
       const originalname = file.originalname;
-      const filename = originalname.replace(/\s+/g, "_").replace(/[\s()+\[\]{}.|!@%]/g, "_");
+      const filename = originalname.replace(/\s+/g, "_").replace(/[\s()+\[\]{}|!@%]/g, "_");
       cb(null, `${new Date().getTime()}_${filename}`);
     },
   }),

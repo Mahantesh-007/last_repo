@@ -29,32 +29,30 @@ const displaySubject = ({ subjectFind }) => {
       )
     : filteredData;
 
-function abc(){
-
-}
+  function abc() {}
   return (
-    <section class="text-gray-600 body-font">
+    <section className="text-gray-600 body-font">
       <form>
         <label
-          for="default-search"
-          class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+          htmlFor="default-search"
+          className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
         >
           Search
         </label>
-        <div class="relative mt-4 mx-auto w-2/6">
-          <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <div className="relative mt-4 mx-auto w-full sm:w-2/3 md:w-1/2 lg:w-1/3">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <svg
               aria-hidden="true"
-              class="w-5 h-5 text-gray-500 dark:text-gray-400"
+              className="w-5 h-5 text-gray-500 dark:text-gray-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
               xmlns="http://www.w3.org/2000/svg"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               ></path>
             </svg>
@@ -62,7 +60,7 @@ function abc(){
           <input
             type="search"
             id="default-search"
-            class="block w-full h-10 p-4 pl-10 text-sm text-gray-500 border border-gray-500 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-50 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="block w-full h-10 p-4 pl-10 text-sm text-gray-500 border border-gray-500 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-50 dark:border-gray-600 dark:placeholder-gray-400 dark:text-black dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -70,61 +68,66 @@ function abc(){
           />
         </div>
       </form>
-      <div class="container px-5 py-24 mx-auto">
-        <div class=" m-4">
-          {subjectDisplayed.map((subject, index) => (
-<div>
-            <div key={subject.id} className="xl:w-1/3 md:w-1/2 p-4">
-              <div className="">
-                {index === 0 ||
-                subject.semester !== subjectDisplayed[index - 1].semester ? (
-                  <div className="">
-                    <h2 className="text-gray-900 text-xl font-medium title-font mb-4 ">
-                      Semester {subject.semester}
-                    </h2>
-                  </div>
-                ) : null}
-              </div>
-              
+      <div className="container px-5 py-12 mx-auto">
+        {subjectDisplayed.reduce((uniqueSubjects, subject, index) => {
+          const isFirstSubject =
+            index === 0 ||
+            subject.semester !== subjectDisplayed[index - 1].semester;
+
+          if (isFirstSubject) {
+            uniqueSubjects.push(
+              <div key={subject.semester} className="mb-8">
+                <div className="mb-4">
+                  <h2 className="text-gray-900 text-xl font-medium title-font mb-2">
+                    Semester {subject.semester}
+                  </h2>
                 </div>
-                   
-              <div className="flex w-full" >
-              
-                <div className="">
-                  <div class="border border-gray-200 p-6 rounded-lg">
-                    <h2 class="text-lg text-gray-900 font-medium title-font mb-2">
-                      {subject.subjectname}
-                    </h2>
-                    <p class="leading-relaxed text-base">{subject.code}</p>
-                    <Link
-                      href={{
-                        pathname: "/Students/displayNotes",
-                        query: { id: subject.code },
-                      }}
-                      class="text-indigo-500 inline-flex items-center"
-                    >
-                      View Notes
-                      <svg
-                        class="w-4 h-4 ml-2"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                <div className="flex flex-wrap -m-4">
+                  {subjectDisplayed
+                    .filter((subj) => subj.semester === subject.semester)
+                    .map((subj) => (
+                      <div
+                        className="p-4 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5"
+                        key={subj.id}
                       >
-                        <path d="M5 12h14"></path>
-                        <path d="M12 5l7 7-7 7"></path>
-                      </svg>
-                    </Link>
-                  </div>
+                        <div className="border border-gray-200 rounded-lg p-6 h-full">
+                          <h2 className="text-lg text-gray-900 font-medium title-font mb-2">
+                            {subj.subjectname}
+                          </h2>
+                          <p className="leading-relaxed text-base">
+                            {subj.code}
+                          </p>
+                          <Link
+                            href={{
+                              pathname: "/Students/displayNotes",
+                              query: { id: subj.code },
+                            }}
+                            className="text-indigo-500 inline-flex items-center mt-4"
+                          >
+                            View Notes
+                            <svg
+                              className="w-4 h-4 ml-2"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              fill="none"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M5 12h14"></path>
+                              <path d="M12 5l7 7-7 7"></path>
+                            </svg>
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
                 </div>
-             
               </div>
-             </div>
-               ))}
-        </div>
-        
+            );
+          }
+
+          return uniqueSubjects;
+        }, [])}
       </div>
     </section>
   );

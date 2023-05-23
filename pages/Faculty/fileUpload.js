@@ -6,6 +6,8 @@ import axios from "axios";
 import { Form, Row, Col, Button } from "react-bootstrap";
 import { useRouter } from "next/router";
 import jwt_decode from "jwt-decode";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,9 +26,7 @@ export default function Home() {
   const [isPreviewAvailable, setIsPreviewAvailable] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const dropRef = useRef();
-  console.log(code);
-  console.log(title);
-  console.log(description);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const decodedToken = jwt_decode(token);
@@ -85,28 +85,49 @@ export default function Home() {
         body: formData,
       });
 
-      console.log(...formData);
-
       if (response.ok) {
-        console.log("hi");
-      } else {
+        toast.success("Successful", {
+          position: "top-center",
+          autoClose: 500,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        setTitle("");
+        setDescription("");
+        setCode("");
+        setSelectedFile("");
+      }
+      
+      else {
         const data = await response.json();
         console.log(data);
       }
-      // setFile(null);
-      // setPreviewSrc("");
-      // setState({
-      //   // title: "",
-      //   // description: "",
-      //   // code: "",
-      // });
+     
     } catch (error) {
       error.response && setErrorMsg(error.response.data);
     }
-  };
+  }
 
   return (
     <>
+      <ToastContainer
+        position="top-center"
+        autoClose={500}
+        limit={1}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+
       <section className="text-gray-600 body-font relative">
         <div className="container px-5 py-24 mx-auto flex">
           <div className="lg:w-1/3 md:w-1/2 bg-white rounded-lg p-8 flex flex-col mx-auto w-full mt-10 md:mt-0 relative z-10 shadow-md">
@@ -192,7 +213,6 @@ export default function Home() {
                   htmlFor="file"
                   className="flex items-center justify-center gap-1 cursor-pointer"
                 >
-                  
                   <span>Upload File</span>
 
                   <input
@@ -203,6 +223,12 @@ export default function Home() {
                     onChange={handleImageChange}
                   />
                 </label>
+                {selectedFile && (
+                  <div className="mt-4">
+                    <strong className="text-gray-800">Selected file:</strong>{" "}
+                    {selectedFile.name}
+                  </div>
+                )}
 
                 {previewSrc ? (
                   isPreviewAvailable ? (

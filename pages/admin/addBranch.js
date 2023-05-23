@@ -22,9 +22,8 @@ function AddDepartment({departmentFind}) {
       }
 
       const data = await response.json();
-      console.log(data.message); // Department created successfully!
-
-      // Reset the form
+      console.log(data.message); 
+      
       setDepartment("");
     } catch (error) {
       console.error(error);
@@ -122,7 +121,7 @@ export async function getServerSideProps(context) {
 
     return {
       props: {
-        departmentFind: departmentCreated, // Corrected key name
+        departmentFind: departmentCreated, 
       },
     };
   } catch (error) {

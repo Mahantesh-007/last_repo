@@ -110,41 +110,40 @@ function displayFaculty({facultyMembers}) {
         pauseOnHover
         theme="light"
       />
-    <TableContainer component={Paper}>
-    <Table sx={{ minWidth: 700 }} aria-label="customized table">
-      <TableHead>
-        <TableRow>
-          <StyledTableCell align = "center">Name</StyledTableCell>
-          <StyledTableCell align = "center">Email</StyledTableCell>
-          <StyledTableCell align="center">Actions</StyledTableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {facultyMembers && Object.keys(facultyMembers).map((item) => (
-          <StyledTableRow key={facultyMembers[item]._id} sx={{ "&:hover": { backgroundColor: "" } }} >
-            {facultyMembers[item].department !== null && (
-              <>
-                <TableCell align = "center">
-                  {facultyMembers[item].username}
-                </TableCell>
-                <TableCell align = "center">
-                  {facultyMembers[item].email}
-                </TableCell>
-                <TableCell align="center">
-                  <Button variant="outlined" onClick={(e) => handleApprove(facultyMembers[item]._id)}>
-                    Approve
-                  </Button>
-                  <Button  variant = "outlined" color = "error" onClick={(e) => handleDelete(facultyMembers[item]._id)}>
-                    Delete
-                  </Button>
-                </TableCell>
-              </>
-            )}
-          </StyledTableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
+    <div className="overflow-x-auto">
+    <table className="min-w-full border-collapse">
+      <thead>
+        <tr>
+          <th className="py-3 px-6 text-center border-b border-gray-300 bg-gray-100">Name</th>
+          <th className="py-3 px-6 text-center border-b border-gray-300 bg-gray-100">Email</th>
+          <th className="py-3 px-6 text-center border-b border-gray-300 bg-gray-100">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {facultyMembers &&
+          Object.keys(facultyMembers).filter(faculties =>!facultyMembers[faculties].isFaculty)
+          .map((item) => (
+            facultyMembers[item].department !== null && (
+              <tr key={facultyMembers[item]._id} className="hover:bg-gray-100">
+                <td className="py-4 px-6 text-center border-b border-gray-300">{facultyMembers[item].username}</td>
+                <td className="py-4 px-6 text-center border-b border-gray-300">{facultyMembers[item].email}</td>
+                <td className="py-4 px-6 text-center border-b border-gray-300">
+                  <div className="space-x-2">
+                    <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-300 ease-in-out" onClick={(e) => handleApprove(facultyMembers[item]._id)}>
+                      Approve
+                    </button>
+                    <button className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-300 ease-in-out" onClick={(e) => handleDelete(facultyMembers[item]._id)}>
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            )
+          ))}
+      </tbody>
+    </table>
+  </div>
+
   </>
 );
 }
