@@ -26,7 +26,7 @@ const uploadedNotes = ({ findNotes, findFile }) => {
         <div class="flex flex-wrap -m-4">
           {findNotes
             .filter((notes) => notes.author === authorid)
-            .filter((items)=>items.subject === subjectid)
+            .filter((items) => items.subject === subjectid)
             .map((notes) => (
               <div key={notes._id} class="xl:w-1/3 md:w-1/2 p-4">
                 <div class="border border-gray-200 p-6 rounded-lg">
@@ -49,10 +49,10 @@ const uploadedNotes = ({ findNotes, findFile }) => {
                 </div>
               </div>
             ))}
-            {findFile
+          {findFile
             .filter((notes) => notes.author === authorid)
-            .filter((items)=>items.subject === subjectid)
-            .map((notes)=> (
+            .filter((items) => items.subject === subjectid)
+            .map((notes) => (
               <div key={notes._id} class="xl:w-1/3 md:w-1/2 p-4">
                 <div class="border border-gray-200 p-6 rounded-lg">
                   <Link
@@ -74,9 +74,23 @@ const uploadedNotes = ({ findNotes, findFile }) => {
                 </div>
               </div>
             ))}
+          {!(
+            findNotes.some(
+              (notes) => notes.subject === subjectid && notes.filename
+            ) ||
+            findFile.some(
+              (notes) => notes.subject === subjectid && notes.file_path
+            )
+          ) && (
+            <div className=" sm:mx-auto lg:mx-auto flex justify-center">
+
+            <p className="text-lg text-gray-600 font-medium  sm:text-xl md:text-2xl lg:text-3xl">
+              No notes are created to display
+            </p>
+            </div>
+          )}
         </div>
       </div>
-      
     </>
   );
 };

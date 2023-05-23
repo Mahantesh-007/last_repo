@@ -6,12 +6,13 @@ connectDB();
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const { filename, description, subject, code, department, author } = req.body;
+    const uppercaseCode = code.toUpperCase();
   
     const file = new File({
       filename,
       description,
       subject,
-      code,
+      code: uppercaseCode,
       department,
       author
     });

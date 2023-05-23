@@ -58,7 +58,7 @@ const yourSubjects = () => {
         setSubjectname("");
         setCode("");
         setSemester("")
-        setDepartment("");
+        
       } else {
         alert("error");
       }

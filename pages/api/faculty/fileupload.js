@@ -52,11 +52,12 @@ export default async function handler(req, res) {
       
       const { title, description, subject, code, department, author  } = req.body;
       const { path, type } = req.file;
+      
       const file = new FileUpload({
         title,
         description,
         subject,
-        code,
+        code: code.toUpperCase(),
         department,
         author,
         file_path: path,

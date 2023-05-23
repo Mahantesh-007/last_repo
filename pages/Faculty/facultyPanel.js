@@ -89,42 +89,45 @@ const FacultyPanel = ({ facultySubject }) => {
         theme="light"
       />
 
-      <section class="text-gray-600 body-font">
-        <div class="container px-5 py-24 mx-auto">
-          <div class="flex flex-wrap -m-4">
-            {facultySubject &&
-              facultySubject
+      <section className="text-gray-600 body-font">
+        <div className="container px-5 py-24 mx-auto">
+          {!facultySubject || !facultySubject.some((item) => item.authorId === authorId) ? (
+           <p className="text-lg text-gray-600 font-medium flex justify-center sm:text-xl md:text-2xl ">No subjects are created to display</p>
+          ) : (
+            <div className="flex flex-wrap -m-4">
+              {facultySubject && facultySubject
                 .filter((item) => item.authorId === authorId)
                 .map((subject) => (
-                  <div key={subject.id} class="xl:w-1/3 md:w-1/2 p-4">
-                    <div class="border border-gray-200 p-6 rounded-lg">
-                      <h2 class="text-lg text-gray-900 font-medium title-font mb-2">
+                  <div key={subject._id} className="xl:w-1/3 md:w-1/2 p-4">
+                    <div className="border border-gray-200 p-6 rounded-lg">
+                      <h2 className="text-lg text-gray-900 font-medium title-font mb-2">
                         {subject.subjectname}
                       </h2>
-                      <p class="leading-relaxed text-base">{subject.code}</p>
+                      <p className="leading-relaxed text-base">
+                        {subject.code}
+                      </p>
                       <div className="flex items-center justify-between">
                         <Link
                           href={{
                             pathname: "/Faculty/uploadedNotes",
                             query: { id: subject._id },
                           }}
-                          class="text-indigo-500 inline-flex items-center"
+                          className="text-indigo-500 inline-flex items-center"
                         >
                           View Notes
                           <svg
-                            class="w-4 h-4 ml-2"
+                            className="w-4 h-4 ml-2"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
-                            stroke-width="2"
+                            strokeWidth="2"
                             fill="none"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                           >
                             <path d="M5 12h14"></path>
                             <path d="M12 5l7 7-7 7"></path>
                           </svg>
                         </Link>
-
                         <div className="flex items-center justify-end">
                           <MdDelete
                             size={24}
@@ -137,7 +140,8 @@ const FacultyPanel = ({ facultySubject }) => {
                     </div>
                   </div>
                 ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
     </>

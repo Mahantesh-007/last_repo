@@ -9,10 +9,11 @@ export default async function handler(req, res) {
     case "POST":
     try {
       const { subjectname, code, department, semester, authorId } = req.body;
+      const uppercaseCode = code.toUpperCase();
 
       const newSubject = new Subjects({
         subjectname,
-        code,
+        code: uppercaseCode,
         department,
         semester,
         authorId
